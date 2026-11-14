@@ -1,0 +1,14 @@
+# Binaries
+scam-checker-bot
+*.exe
+
+# Environment
+.env
+run.bat
+
+# Go test cache
+*.test
+
+# Google credentials (never commit)
+*.json
+!go.sum
