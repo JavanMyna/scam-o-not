@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
@@ -29,7 +30,11 @@ func NewGeminiAnalyzer(ctx context.Context, apiKey string) (*GeminiAnalyzer, err
 		return nil, fmt.Errorf("gemini client: %w", err)
 	}
 
-	model := client.GenerativeModel("gemini-1.5-flash")
+	modelName := os.Getenv("GEMINI_MODEL")
+	if modelName == "" {
+		modelName = "gemini-3.5-flash"
+	}
+	model := client.GenerativeModel(modelName)
 	model.SystemInstruction = &genai.Content{
 		Parts: []genai.Part{genai.Text(systemInstruction)},
 	}
