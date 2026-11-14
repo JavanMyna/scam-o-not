@@ -14,12 +14,12 @@ var urlPattern = regexp.MustCompile(`https?://[^\s"'<>]+`)
 
 // WebRiskChecker queries the Google Web Risk API for known malicious URLs.
 type WebRiskChecker struct {
-	client *webrisk.WebRiskClient
+	client *webrisk.Client
 }
 
 // NewWebRiskChecker creates a WebRiskChecker using Application Default Credentials.
 func NewWebRiskChecker(ctx context.Context) (*WebRiskChecker, error) {
-	c, err := webrisk.NewWebRiskClient(ctx)
+	c, err := webrisk.NewClient(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("webrisk client: %w", err)
 	}
@@ -28,7 +28,7 @@ func NewWebRiskChecker(ctx context.Context) (*WebRiskChecker, error) {
 
 // Close releases resources held by the client.
 func (w *WebRiskChecker) Close() {
-	w.client.Close()
+	_ = w.client.Close()
 }
 
 // ThreatResult describes whether a URL is flagged as a known threat.
