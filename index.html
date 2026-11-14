@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scam-O-Not 🛡️ | Suspicious Message & Scam Detector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-glow glow-1"></div>
+  <div class="background-glow glow-2"></div>
+
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="brand">
+        <div class="logo-shield">🛡️</div>
+        <div>
+          <h1>Scam-O-Not</h1>
+          <p class="tagline">Customer Support Scam & Social Engineering Detector</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="toggle-key-btn" class="btn-ghost" title="Configure API Key">
+          🔑 <span id="key-status-text">API Key Set</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- API Key Modal / Drawer -->
+  <div id="key-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Google Gemini API Key</h3>
+        <button id="close-modal-btn" class="btn-close">&times;</button>
+      </div>
+      <p class="modal-desc">
+        Your key is stored locally in your browser (<span class="code">localStorage</span>). It is never sent to any third-party server.
+      </p>
+      <div class="input-group">
+        <input type="password" id="gemini-key-input" placeholder="AIzaSy... or AQ.Ab8..." autocomplete="off">
+        <button id="toggle-key-visibility" class="btn-ghost">👁️</button>
+      </div>
+      <div class="modal-footer">
+        <button id="save-key-btn" class="btn-primary">Save Key</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container main-content">
+    <!-- Intro Banner -->
+    <section class="hero-section">
+      <h2>Received a suspicious message from "Support"?</h2>
+      <p>Check text messages, emails, or screenshots for impersonation, urgency tactics, fake links, and credential phishing before you click or reply.</p>
+    </section>
+
+    <!-- Checker Workspace -->
+    <div class="checker-grid">
+      <!-- Input Panel -->
+      <section class="card input-card">
+        <div class="card-header">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="text">📝 Paste Message</button>
+            <button class="tab-btn" data-tab="image">🖼️ Upload Screenshot</button>
+          </div>
+        </div>
+
+        <!-- Text Input Tab -->
+        <div id="text-tab-pane" class="tab-pane active">
+          <textarea id="message-text" placeholder="Paste the suspicious message, SMS, or email here...
+e.g., 'Dear Customer, your Netflix subscription has expired. Update payment immediately at http://netflix-update.top to prevent account suspension.'"></textarea>
+          
+          <div class="sample-presets">
+            <span class="preset-label">Try a sample:</span>
+            <button class="preset-chip" data-sample="netflix">🚨 Netflix Phishing</button>
+            <button class="preset-chip" data-sample="paypal">🚨 PayPal Security</button>
+            <button class="preset-chip" data-sample="amazon">⚠️ Amazon Order</button>
+            <button class="preset-chip" data-sample="safe">✅ Real Bank OTP</button>
+          </div>
+        </div>
+
+        <!-- Image Input Tab -->
+        <div id="image-tab-pane" class="tab-pane">
+          <div id="drop-zone" class="drop-zone">
+            <input type="file" id="file-input" accept="image/*" class="file-hidden">
+            <div id="drop-zone-prompt">
+              <div class="upload-icon">📸</div>
+              <p class="drop-title">Drop your screenshot here</p>
+              <p class="drop-sub">or <span class="browse-link">browse files</span> (supports JPG, PNG, WebP, or paste with <kbd>Ctrl+V</kbd>)</p>
+            </div>
+            <div id="image-preview-wrapper" class="hidden">
+              <img id="image-preview" alt="Screenshot preview">
+              <button id="remove-image-btn" class="btn-remove" title="Remove image">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-footer">
+          <button id="analyze-btn" class="btn-primary btn-large">
+            <span class="btn-text">Analyze for Scams 🔍</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Results Panel -->
+      <section class="card result-card" id="result-card">
+        <!-- Initial Blank State -->
+        <div id="empty-state" class="state-container">
+          <div class="state-icon">🛡️</div>
+          <h3>Ready for Scam Analysis</h3>
+          <p>Paste a suspicious message or upload a screenshot on the left, then click <strong>Analyze for Scams</strong>.</p>
+          <div class="inspection-features">
+            <div class="feature-item">⚡ <span>Detects urgency & fear tactics</span></div>
+            <div class="feature-item">👤 <span>Flags brand impersonation</span></div>
+            <div class="feature-item">🔗 <span>Analyzes deceptive URLs</span></div>
+            <div class="feature-item">💡 <span>Gives step-by-step safe checks</span></div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="state-container hidden">
+          <div class="radar-scan">
+            <div class="radar-circle"></div>
+            <div class="radar-beam"></div>
+          </div>
+          <h3>Inspecting Message Tactics...</h3>
+          <p id="loading-text">Examining urgency signals, claimed identity, and phishing domains...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="state-container hidden">
+          <div class="state-icon error-icon">⚠️</div>
+          <h3 id="error-title">Analysis Failed</h3>
+          <p id="error-message">Could not complete analysis. Check your API key or network connection.</p>
+          <button id="retry-btn" class="btn-secondary">Try Again</button>
+        </div>
+
+        <!-- Report Content -->
+        <div id="report-content" class="report-wrapper hidden">
+          <!-- Risk Score Header -->
+          <div class="risk-banner" id="risk-banner">
+            <div class="score-circle-wrap">
+              <div class="score-circle" id="score-circle">
+                <span class="score-number" id="risk-score-val">90</span>
+                <span class="score-max">/100</span>
+              </div>
+            </div>
+            <div class="risk-meta">
+              <div class="badge-row">
+                <span class="risk-badge" id="risk-level-badge">HIGH RISK</span>
+              </div>
+              <div class="identity-row">
+                <span class="label">Claimed Entity:</span>
+                <span class="value" id="claimed-entity-val">Netflix Support</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning Signs -->
+          <div class="report-section">
+            <div class="section-title">
+              <span class="icon">🚩</span>
+              <h4>Observed Warning Signs</h4>
+            </div>
+            <ul class="findings-list" id="warning-signs-list">
+              <!-- Rendered via JS -->
+            </ul>
+          </div>
+
+          <!-- Safe Verification Steps -->
+          <div class="report-section">
+            <div class="section-title safe-title">
+              <span class="icon">🛡️</span>
+              <h4>How to Verify Safely Before Acting</h4>
+            </div>
+            <ol class="steps-list" id="safe-steps-list">
+              <!-- Rendered via JS -->
+            </ol>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="report-actions">
+            <button id="copy-report-btn" class="btn-secondary">📋 Copy Report</button>
+            <button id="reset-btn" class="btn-ghost">🔄 Check Another</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <p>Scam-O-Not is a defensive cybersecurity assistant. Always verify through official apps or bookmarks directly.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
