@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"cloud.google.com/go/vertexai/genai"
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 	"scam-checker-bot/internal/models"
 )
 
@@ -15,17 +16,17 @@ Analyze the message or screenshot and identify social engineering tactics
 (urgency, impersonation, fear, unusual requests for credentials/OTP/gift cards/crypto).
 Return ONLY valid JSON matching the requested schema — no markdown fences, no extra text.`
 
-// GeminiAnalyzer wraps the Vertex AI Gemini client.
+// GeminiAnalyzer wraps the Google Generative AI (Gemini) client.
 type GeminiAnalyzer struct {
 	client *genai.Client
 	model  *genai.GenerativeModel
 }
 
-// NewGeminiAnalyzer creates and configures a GeminiAnalyzer.
-func NewGeminiAnalyzer(ctx context.Context, projectID, location string) (*GeminiAnalyzer, error) {
-	client, err := genai.NewClient(ctx, projectID, location)
+// NewGeminiAnalyzer creates and configures a GeminiAnalyzer using an AI Studio API key.
+func NewGeminiAnalyzer(ctx context.Context, apiKey string) (*GeminiAnalyzer, error) {
+	client, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
-		return nil, fmt.Errorf("vertexai client: %w", err)
+		return nil, fmt.Errorf("gemini client: %w", err)
 	}
 
 	model := client.GenerativeModel("gemini-1.5-flash")

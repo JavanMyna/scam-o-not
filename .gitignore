@@ -4,6 +4,7 @@ scam-checker-bot
 
 # Environment
 .env
+run.bat
 
 # Go test cache
 *.test

@@ -19,12 +19,11 @@ func main() {
 
 	// ── Configuration from environment variables ────────────────────────────
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
-	projectID := mustEnv("GCP_PROJECT_ID")
-	location := envOr("GCP_LOCATION", "us-central1")
+	geminiAPIKey := mustEnv("GEMINI_API_KEY")
 	webhookURL := os.Getenv("WEBHOOK_URL") // optional; falls back to polling
 
-	// ── Gemini (Vertex AI) ──────────────────────────────────────────────────
-	geminiAnalyzer, err := analyzer.NewGeminiAnalyzer(ctx, projectID, location)
+	// ── Gemini (Google AI Studio) ───────────────────────────────────────────
+	geminiAnalyzer, err := analyzer.NewGeminiAnalyzer(ctx, geminiAPIKey)
 	if err != nil {
 		log.Fatalf("init gemini analyzer: %v", err)
 	}
